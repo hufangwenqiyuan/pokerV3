@@ -61,14 +61,14 @@ func createSequenceTableWithoutGhost() map[string]int {
 }
 
 func create32Table(result map[string]seqCards) {
-	raw := []string{}
+	raw := make([]string, 0)
 	selectCards(2, "", &raw)
 	//fmt.Println(raw)
 	for _, item := range raw {
 		material := []string{string(item[0]), string(item[0]), string(item[0]), string(item[1]), string(item[1])}
 		kind := seqCards{threeTwo, []int{table[item[0]], table[item[1]]}}
 
-		possible := []string{}
+		possible := make([]string, 0)
 		permutate(material, 0, 5, &possible)
 		for _, p := range possible {
 			result[p] = kind
@@ -202,7 +202,7 @@ func NewSimpleCards() *SimpleCards {
 }
 
 func createCoupleTable(result map[string]seqCards) {
-	raw := []string{}
+	raw := make([]string, 0)
 	selectCards(4, "", &raw)
 	//fmt.Println(raw)
 	for _, item := range raw {
@@ -212,7 +212,7 @@ func createCoupleTable(result map[string]seqCards) {
 		sorted := []int{table[item[0]]}
 		kind := seqCards{couple, append(sorted, seq...)}
 
-		possible := []string{}
+		possible := make([]string, 0)
 		permutate(material, 0, 5, &possible)
 		for _, p := range possible {
 			result[p] = kind
@@ -221,7 +221,7 @@ func createCoupleTable(result map[string]seqCards) {
 }
 
 func createCouple2Table(result map[string]seqCards) {
-	raw := []string{}
+	raw := make([]string, 0)
 	selectCards(3, "", &raw)
 	//fmt.Println(raw)
 	for _, item := range raw {
@@ -232,7 +232,7 @@ func createCouple2Table(result map[string]seqCards) {
 		}
 		kind := seqCards{couple2, []int{max, min, table[item[2]]}}
 
-		possible := []string{}
+		possible := make([]string, 0)
 		permutate(material, 0, 5, &possible)
 		for _, p := range possible {
 			result[p] = kind
@@ -241,7 +241,7 @@ func createCouple2Table(result map[string]seqCards) {
 }
 
 func create3Table(result map[string]seqCards) {
-	raw := []string{}
+	raw := make([]string, 0)
 	selectCards(3, "", &raw)
 	//fmt.Println(raw)
 	for _, item := range raw {
@@ -252,7 +252,7 @@ func create3Table(result map[string]seqCards) {
 		}
 		kind := seqCards{three, []int{table[item[0]], max, min}}
 
-		possible := []string{}
+		possible := make([]string, 0)
 		permutate(material, 0, 5, &possible)
 		for _, p := range possible {
 			result[p] = kind
@@ -261,14 +261,14 @@ func create3Table(result map[string]seqCards) {
 }
 
 func create4Table(result map[string]seqCards) {
-	raw := []string{}
+	raw := make([]string, 0)
 	selectCards(2, "", &raw)
 	//fmt.Println(raw)
 	for _, item := range raw {
 		material := []string{string(item[0]), string(item[0]), string(item[0]), string(item[0]), string(item[1])}
 		kind := seqCards{four, []int{table[item[0]], table[item[1]]}}
 
-		possible := []string{}
+		possible := make([]string, 0)
 		permutate(material, 0, 5, &possible)
 		for _, p := range possible {
 			result[p] = kind
