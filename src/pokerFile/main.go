@@ -10,6 +10,13 @@ import (
 )
 
 func main() {
+	fivePoker()
+	servenPoker()
+	fiveAndHiting()
+	sevenAndHiting()
+}
+
+func fivePoker() {
 	var raw map[string][]model.Round
 	inputData := readFile.ReadFile("./src/pokerFile/match.json")
 	err := json.Unmarshal(inputData, &raw)
@@ -40,54 +47,62 @@ func main() {
 		questions[i].Result = poker_server.CompareResult(aliceMode, aliceV, bobMode, bobV)
 	}
 	fmt.Println("5 张牌无赖子: ", time.Now().Sub(start))
+}
 
-	//...------------------------------------------------------------- 7cards===========================
-	inputData = readFile.ReadFile("./src/pokerFile/seven_cards.json")
-	err = json.Unmarshal(inputData, &raw)
+func servenPoker() {
+	var raw map[string][]model.Round
+	inputData := readFile.ReadFile("./src/pokerFile/seven_cards.json")
+	err := json.Unmarshal(inputData, &raw)
 	if err != nil {
 		panic(err)
 	}
-	questions = raw["matches"]
+	questions := raw["matches"]
 	mgr1 := poker_server.NewCardBuf()
 	mgr2 := poker_server.NewCardBuf()
 
-	number = len(questions)
-	start = time.Now()
+	number := len(questions)
+	start := time.Now()
 	for i := 0; i < number; i++ {
 		aliceMode, aliceV, bobMode, bobV := poker_server.Process(mgr1, mgr2, questions[i].Alice, questions[i].Bob)
 		questions[i].Result = poker_server.CompareResult(aliceMode, aliceV, bobMode, bobV)
 	}
 	fmt.Println("7 张牌无赖子: ", time.Now().Sub(start))
 
-	//====================================================================5 with ghost=============
-	inputData = readFile.ReadFile("./src/pokerFile/seven_cards_with_ghost.json")
-	err = json.Unmarshal(inputData, &raw)
+}
+
+func fiveAndHiting() {
+	var raw map[string][]model.Round
+	inputData := readFile.ReadFile("./src/pokerFile/seven_cards_with_ghost.json")
+	err := json.Unmarshal(inputData, &raw)
 	if err != nil {
 		panic(err)
 	}
-	questions = raw["matches"]
-	mgr1 = poker_server.NewCardBuf()
-	mgr2 = poker_server.NewCardBuf()
+	questions := raw["matches"]
+	mgr1 := poker_server.NewCardBuf()
+	mgr2 := poker_server.NewCardBuf()
 
-	number = len(questions)
-	start = time.Now()
+	number := len(questions)
+	start := time.Now()
 	for i := 0; i < number; i++ {
 		aliceMode, aliceV, bobMode, bobV := poker_server.Process(mgr1, mgr2, questions[i].Alice, questions[i].Bob)
 		questions[i].Result = poker_server.CompareResult(aliceMode, aliceV, bobMode, bobV)
 	}
 	fmt.Println("5 张牌有赖子: ", time.Now().Sub(start))
-	//====================================================================7 with ghost====================
-	inputData = readFile.ReadFile("./src/pokerFile/seven_cards_with_ghost.json")
-	err = json.Unmarshal(inputData, &raw)
+}
+
+func sevenAndHiting() {
+	var raw map[string][]model.Round
+	inputData := readFile.ReadFile("./src/pokerFile/seven_cards_with_ghost.json")
+	err := json.Unmarshal(inputData, &raw)
 	if err != nil {
 		panic(err)
 	}
-	questions = raw["matches"]
-	mgr1 = poker_server.NewCardBuf()
-	mgr2 = poker_server.NewCardBuf()
+	questions := raw["matches"]
+	mgr1 := poker_server.NewCardBuf()
+	mgr2 := poker_server.NewCardBuf()
 
-	number = len(questions)
-	start = time.Now()
+	number := len(questions)
+	start := time.Now()
 	for i := 0; i < number; i++ {
 		aliceMode, aliceV, bobMode, bobV := poker_server.Process(mgr1, mgr2, questions[i].Alice, questions[i].Bob)
 		questions[i].Result = poker_server.CompareResult(aliceMode, aliceV, bobMode, bobV)
