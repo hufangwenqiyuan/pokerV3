@@ -39,7 +39,7 @@ func main() {
 		bobMode, bobV := mgr.Process(bobs[i], bobColor[i])
 		questions[i].Result = poker_server.CompareResult(aliceMode, aliceV, bobMode, bobV)
 	}
-	fmt.Println("5 cards without ghost cost: ", time.Now().Sub(start))
+	fmt.Println("5 张牌无赖子: ", time.Now().Sub(start))
 
 	//...------------------------------------------------------------- 7cards===========================
 	inputData = readFile.ReadFile("./src/pokerFile/seven_cards.json")
@@ -57,7 +57,7 @@ func main() {
 		aliceMode, aliceV, bobMode, bobV := poker_server.Process(mgr1, mgr2, questions[i].Alice, questions[i].Bob)
 		questions[i].Result = poker_server.CompareResult(aliceMode, aliceV, bobMode, bobV)
 	}
-	fmt.Println("7 cards without ghost cost: ", time.Now().Sub(start))
+	fmt.Println("7 张牌无赖子: ", time.Now().Sub(start))
 
 	//====================================================================5 with ghost=============
 	inputData = readFile.ReadFile("./src/pokerFile/seven_cards_with_ghost.json")
@@ -75,7 +75,7 @@ func main() {
 		aliceMode, aliceV, bobMode, bobV := poker_server.Process(mgr1, mgr2, questions[i].Alice, questions[i].Bob)
 		questions[i].Result = poker_server.CompareResult(aliceMode, aliceV, bobMode, bobV)
 	}
-	fmt.Println("5 cards with ghost cost: ", time.Now().Sub(start))
+	fmt.Println("5 张牌有赖子: ", time.Now().Sub(start))
 	//====================================================================7 with ghost====================
 	inputData = readFile.ReadFile("./src/pokerFile/seven_cards_with_ghost.json")
 	err = json.Unmarshal(inputData, &raw)
@@ -92,5 +92,5 @@ func main() {
 		aliceMode, aliceV, bobMode, bobV := poker_server.Process(mgr1, mgr2, questions[i].Alice, questions[i].Bob)
 		questions[i].Result = poker_server.CompareResult(aliceMode, aliceV, bobMode, bobV)
 	}
-	fmt.Println("7 cards with ghost cost: ", time.Now().Sub(start))
+	fmt.Println("7 张牌有赖子: ", time.Now().Sub(start))
 }
