@@ -1,5 +1,281 @@
 package poker_server
 
+import "strings"
+
+func createFullTableWithoutGhost() map[string]seqCards {
+	ret := make(map[string]seqCards)
+	smallTab := createSequenceTableWithoutGhost()
+
+	for k, v := range smallTab {
+		max := table[k[0]]
+		if k == "A5432" {
+			max = 5
+		}
+		createCardsTable(5, ret, divideStr(k), "", []int{max}, v)
+	}
+	return ret
+}
+
+func divideStr(s string) (ret []string) {
+	for i := 0; i < len(s); i++ {
+		ret = append(ret, string(s[i]))
+	}
+	return
+}
+func createCardsTable(num int, tab map[string]seqCards, all []string, part string, max []int, mode int) {
+	if len(part) == num {
+		sc := seqCards{mode, max}
+		tab[part] = sc
+		return
+	}
+	ss := divideStr(part)
+	for i := 0; i < len(all); i++ {
+		temp := part
+		if len(ss) == 0 || !stringContainedInSlice(all[i], ss) {
+			temp += all[i]
+			createCardsTable(num, tab, all, temp, max, mode)
+		}
+	}
+}
+
+func stringContainedInSlice(str string, sli []string) bool {
+	for _, s := range sli {
+		if str == s {
+			return true
+		}
+	}
+	return false
+}
+
+func createSequenceTableWithoutGhost() map[string]int {
+	table := make(map[string]int)
+	str := []string{"K", "Q", "J", "T", "9", "8", "7", "6", "5", "4", "3", "2"}
+	table["AKQJT"] = royal
+	table["A5432"] = flush
+	for i := 0; i < 8; i++ {
+		key := str[i] + str[i+1] + str[i+2] + str[i+3] + str[i+4]
+		table[key] = flush
+	}
+	//fmt.Println(table)
+	return table
+}
+
+func create32Table(result map[string]seqCards) {
+	raw := []string{}
+	selectCards(2, "", &raw)
+	//fmt.Println(raw)
+	for _, item := range raw {
+		material := []string{string(item[0]), string(item[0]), string(item[0]), string(item[1]), string(item[1])}
+		kind := seqCards{threeTwo, []int{table[item[0]], table[item[1]]}}
+
+		possible := []string{}
+		permutate(material, 0, 5, &possible)
+		for _, p := range possible {
+			result[p] = kind
+		}
+	}
+}
+func isSwap(str []string, begin, end int) bool {
+	for i := begin; i < end; i++ {
+		if str[i] == str[end] {
+			return false
+		}
+	}
+	return true
+}
+
+func permutate(sample []string, begin, end int, kinds *[]string) {
+	if begin == end {
+		*kinds = append(*kinds, strings.Join(sample, ""))
+		return
+	}
+
+	for i := begin; i < end; i++ {
+		if isSwap(sample, begin, i) {
+			sample[begin], sample[i] = sample[i], sample[begin]
+			permutate(sample, begin+1, end, kinds)
+			sample[begin], sample[i] = sample[i], sample[begin]
+		}
+	}
+}
+
+func selectCards(num int, part string, ret *[]string) {
+	if len(part) == num {
+		*ret = append(*ret, part)
+		return
+	}
+	all := []string{"A", "K", "Q", "J", "T", "9", "8", "7", "6", "5", "4", "3", "2"}
+	ss := divideStr(part)
+	for i := 0; i < len(all); i++ {
+		temp := part
+		if len(ss) == 0 || !stringContainedInSlice(all[i], ss) {
+			temp += all[i]
+			//fmt.Println(temp)
+			selectCards(num, temp, ret)
+		}
+	}
+}
+
+func NewCardBuf() *cardBuf {
+	cb := &cardBuf{cardState: alone, same: true}
+	cb.sOrder = make([]int, 7)
+	cb.dOrder = make([]int, 3)
+	cb.tOrder = make([]int, 2)
+	cb.color = make([]cardColor, 4)
+	cb.color[spades].cards = make([]int, 7)
+	cb.color[clubs].cards = make([]int, 7)
+	cb.color[hearts].cards = make([]int, 7)
+	cb.color[diamonds].cards = make([]int, 7)
+
+	cb.tabGhost = createSequenceTableWithGhost()
+	cb.tabNoGhost = createSequenceTableWithoutGhost()
+	cb.tabFullNoGhost = createFullTableWithoutGhost()
+
+	return cb
+}
+
+func createSequenceTableWithGhost() map[string]int {
+	table := make(map[string]int)
+	str := []string{"Q", "J", "T", "9", "8", "7", "6", "5", "4", "3", "2"}
+	table["AKQJ"] = royal
+	table["AQJT"] = royal
+	table["AKQT"] = royal
+	table["AKJT"] = royal
+	table["KQJT"] = royal
+
+	table["KJT9"] = flush
+	table["KQT9"] = flush
+	table["KQJ9"] = flush
+	table["QJT9"] = flush
+
+	table["A543"] = flush
+	table["A432"] = flush
+	table["A532"] = flush
+	table["A542"] = flush
+
+	for i := 0; i < 6; i++ {
+		for j := 0; j < 5; j++ {
+			key := ""
+			for k := 0; k < 5; k++ {
+				if k != j {
+					key += str[i+k]
+				}
+			}
+			table[key] = flush
+		}
+	}
+	return table
+}
+
+func CompareResult(mode1 int, v1 []int, mode2 int, v2 []int) int {
+	if mode1 < mode2 {
+		return over
+	} else if mode1 > mode2 {
+		return less
+	} else {
+		switch mode1 {
+		case royal:
+			return equal
+		default:
+			for i := 0; i < len(v1); i++ {
+				if v1[i] > v2[i] {
+					return over
+				} else if v1[i] < v2[i] {
+					return less
+				}
+			}
+		}
+	}
+	return equal
+}
+
+func NewSimpleCards() *SimpleCards {
+	ret := &SimpleCards{}
+	ret.buf = make([]int, 5)
+	ret.table5 = createFullTableWithoutGhost()
+	create32Table(ret.table5)
+	create4Table(ret.table5)
+	create3Table(ret.table5)
+	createCouple2Table(ret.table5)
+	createCoupleTable(ret.table5)
+	return ret
+}
+
+func createCoupleTable(result map[string]seqCards) {
+	raw := []string{}
+	selectCards(4, "", &raw)
+	//fmt.Println(raw)
+	for _, item := range raw {
+		material := []string{string(item[0]), string(item[0]), string(item[1]), string(item[2]), string(item[3])}
+		seq := []int{table[item[1]], table[item[2]], table[item[3]]}
+		sortCard(seq, 3)
+		sorted := []int{table[item[0]]}
+		kind := seqCards{couple, append(sorted, seq...)}
+
+		possible := []string{}
+		permutate(material, 0, 5, &possible)
+		for _, p := range possible {
+			result[p] = kind
+		}
+	}
+}
+
+func createCouple2Table(result map[string]seqCards) {
+	raw := []string{}
+	selectCards(3, "", &raw)
+	//fmt.Println(raw)
+	for _, item := range raw {
+		material := []string{string(item[0]), string(item[0]), string(item[1]), string(item[1]), string(item[2])}
+		max, min := table[item[0]], table[item[1]]
+		if max < min {
+			max, min = min, max
+		}
+		kind := seqCards{couple2, []int{max, min, table[item[2]]}}
+
+		possible := []string{}
+		permutate(material, 0, 5, &possible)
+		for _, p := range possible {
+			result[p] = kind
+		}
+	}
+}
+
+func create3Table(result map[string]seqCards) {
+	raw := []string{}
+	selectCards(3, "", &raw)
+	//fmt.Println(raw)
+	for _, item := range raw {
+		material := []string{string(item[0]), string(item[0]), string(item[0]), string(item[1]), string(item[2])}
+		max, min := table[item[1]], table[item[2]]
+		if max < min {
+			max, min = min, max
+		}
+		kind := seqCards{three, []int{table[item[0]], max, min}}
+
+		possible := []string{}
+		permutate(material, 0, 5, &possible)
+		for _, p := range possible {
+			result[p] = kind
+		}
+	}
+}
+
+func create4Table(result map[string]seqCards) {
+	raw := []string{}
+	selectCards(2, "", &raw)
+	//fmt.Println(raw)
+	for _, item := range raw {
+		material := []string{string(item[0]), string(item[0]), string(item[0]), string(item[0]), string(item[1])}
+		kind := seqCards{four, []int{table[item[0]], table[item[1]]}}
+
+		possible := []string{}
+		permutate(material, 0, 5, &possible)
+		for _, p := range possible {
+			result[p] = kind
+		}
+	}
+}
+
 func Preprocess(raw string) (string, []int) {
 	str := ""
 	color := []int{0, 0, 0, 0}

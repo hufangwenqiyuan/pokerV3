@@ -1,6 +1,14 @@
 package poker_server
 
 const (
+	same = true
+	diff = false
+
+	over  = 1
+	less  = 2
+	equal = 0
+)
+const (
 	royal    = iota //皇家同花顺
 	flush           //同花顺
 	four            //4条

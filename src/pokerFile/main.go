@@ -3,9 +3,9 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"pokerv2/src/pokerFile/model"
-	"pokerv2/src/pokerFile/poker_server"
-	"pokerv2/src/pokerFile/readFile"
+	"pokerV3/src/pokerFile/model"
+	"pokerV3/src/pokerFile/poker_server"
+	"pokerV3/src/pokerFile/readFile"
 	"time"
 )
 
