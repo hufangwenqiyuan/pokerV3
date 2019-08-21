@@ -25,10 +25,10 @@ func fivePoker() {
 	}
 	questions := raw["matches"]
 	number := len(questions)
-	alices := []string{}
-	aliceColor := [][]int{}
-	bobs := []string{}
-	bobColor := [][]int{}
+	alices := make([]string, 0)
+	aliceColor := make([][]int, 0)
+	bobs := make([]string, 0)
+	bobColor := make([][]int, 0)
 	for i := 0; i < number; i++ {
 		a, ac := poker_server.Preprocess(questions[i].Alice)
 		alices = append(alices, a)

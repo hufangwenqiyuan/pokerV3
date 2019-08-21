@@ -53,15 +53,15 @@ type seqCards struct {
 }
 
 type cardBuf struct {
-	s_order    []int
+	sOrder     []int
 	single     int
-	s_cnt      int
-	d_order    []int
+	sCcnt      int
+	dOrder     []int
 	double     int
-	d_cnt      int
-	t_order    []int
+	dCnt       int
+	tOrder     []int
 	tripple    int
-	t_cnt      int
+	tCnt       int
 	card4      int
 	cardState  int
 	color      []cardColor
@@ -73,11 +73,11 @@ type cardBuf struct {
 }
 
 func (cb *cardBuf) clear() {
-	cb.s_cnt = 0
+	cb.sCcnt = 0
 	cb.single = 0
-	cb.d_cnt = 0
+	cb.dCnt = 0
 	cb.double = 0
-	cb.t_cnt = 0
+	cb.tCnt = 0
 	cb.tripple = 0
 	cb.card4 = 0
 	cb.color[diamonds].count, cb.color[clubs].count, cb.color[hearts].count, cb.color[spades].count = 0, 0, 0, 0
@@ -113,16 +113,16 @@ func (cb *cardBuf) addCard(cards string, length int) bool {
 		off := 1 << uint(card)
 		if (cb.single & off) == 0 {
 			cb.single |= off
-			cb.s_order[cb.s_cnt] = card
-			cb.s_cnt++
+			cb.sOrder[cb.sCcnt] = card
+			cb.sCcnt++
 		} else if (cb.double & off) == 0 {
 			cb.double |= off
-			cb.d_order[cb.d_cnt] = card
-			cb.d_cnt++
+			cb.dOrder[cb.dCnt] = card
+			cb.dCnt++
 		} else if (cb.tripple & off) == 0 {
 			cb.tripple |= off
-			cb.t_order[cb.t_cnt] = card
-			cb.t_cnt++
+			cb.tOrder[cb.tCnt] = card
+			cb.tCnt++
 		} else {
 			cb.card4 = card
 		}
@@ -172,8 +172,8 @@ func combineKey(dat ...int) string {
 }
 
 func (cb *cardBuf) checkSingleCards(ghost bool) (mode int, ret int) {
-	dat := cb.s_order
-	length := cb.s_cnt
+	dat := cb.sOrder
+	length := cb.sCcnt
 	if length < 4 || (length == 4 && !ghost) {
 		// 有赖子得满4张 || 无赖子得满5张
 		return alone, dat[0]
@@ -218,29 +218,29 @@ func (cb *cardBuf) checkBomb(ghost bool) (bool, int) {
 		return true, cb.card4
 	}
 	if ghost {
-		if cb.t_cnt > 0 {
-			return true, cb.t_order[0]
+		if cb.tCnt > 0 {
+			return true, cb.tOrder[0]
 		}
 	}
 	return false, 0
 }
 
 func (cb *cardBuf) checkThreeTwo(ghost bool) (bool, int, int) {
-	if cb.t_cnt > 0 {
-		z3 := cb.t_order[0]
+	if cb.tCnt > 0 {
+		z3 := cb.tOrder[0]
 		max := 0
-		for i := 0; i < cb.d_cnt; i++ {
-			if z3 != cb.d_order[i] {
-				max = cb.d_order[i]
+		for i := 0; i < cb.dCnt; i++ {
+			if z3 != cb.dOrder[i] {
+				max = cb.dOrder[i]
 				break
 			}
 		}
 		if ghost {
 			//3+1+赖子
-			for i := 0; i < cb.s_cnt; i++ {
-				if cb.s_order[i] != z3 {
-					if max < cb.s_order[i] {
-						max = cb.s_order[0]
+			for i := 0; i < cb.sCcnt; i++ {
+				if cb.sOrder[i] != z3 {
+					if max < cb.sOrder[i] {
+						max = cb.sOrder[0]
 						break
 					}
 				}
@@ -252,8 +252,8 @@ func (cb *cardBuf) checkThreeTwo(ghost bool) (bool, int, int) {
 	} else {
 		if ghost {
 			// 2+2+赖子
-			if cb.d_cnt > 1 {
-				return true, cb.d_order[0], cb.d_order[1]
+			if cb.dCnt > 1 {
+				return true, cb.dOrder[0], cb.dOrder[1]
 			}
 		}
 	}
@@ -263,13 +263,13 @@ func (cb *cardBuf) checkThreeTwo(ghost bool) (bool, int, int) {
 
 func (cb *cardBuf) checkThree(ghost bool) (bool, int) {
 	max := 0
-	if cb.t_cnt > 0 {
-		max = cb.t_order[0]
+	if cb.tCnt > 0 {
+		max = cb.tOrder[0]
 	}
 	if ghost {
-		for i := 0; i < cb.d_cnt; i++ {
-			if max < cb.d_order[i] {
-				max = cb.d_order[i]
+		for i := 0; i < cb.dCnt; i++ {
+			if max < cb.dOrder[i] {
+				max = cb.dOrder[i]
 			}
 		}
 	}
@@ -282,10 +282,10 @@ func (cb *cardBuf) checkThree(ghost bool) (bool, int) {
 func (cb *cardBuf) check2Couple(ghost bool) (bool, int, int) {
 	first := 0
 	second := 0
-	if cb.d_cnt > 1 {
-		first, second = cb.d_order[0], cb.d_order[1]
-	} else if cb.d_cnt > 0 {
-		first = cb.d_order[0]
+	if cb.dCnt > 1 {
+		first, second = cb.dOrder[0], cb.dOrder[1]
+	} else if cb.dCnt > 0 {
+		first = cb.dOrder[0]
 	}
 	if first > 0 && second > 0 {
 		return true, first, second
@@ -295,12 +295,12 @@ func (cb *cardBuf) check2Couple(ghost bool) (bool, int, int) {
 
 func (cb *cardBuf) checkCouple(ghost bool) (bool, int) {
 	max := 0
-	if cb.d_cnt > 0 {
-		max = cb.d_order[0]
+	if cb.dCnt > 0 {
+		max = cb.dOrder[0]
 	}
 	if ghost {
-		if cb.s_order[0] > max {
-			return true, cb.s_order[0]
+		if cb.sOrder[0] > max {
+			return true, cb.sOrder[0]
 		}
 	}
 	if max > 0 {
@@ -313,9 +313,9 @@ func (cb *cardBuf) checkType(ghost bool) (int, []int) {
 	m2, v2 := cb.checkBomb(ghost)
 	if m2 {
 		ret := []int{v2, 0}
-		for i := 0; i < len(cb.s_order); i++ {
-			if cb.s_order[i] != v2 {
-				ret[1] = cb.s_order[i]
+		for i := 0; i < len(cb.sOrder); i++ {
+			if cb.sOrder[i] != v2 {
+				ret[1] = cb.sOrder[i]
 				return four, ret
 			}
 		}
@@ -334,9 +334,9 @@ func (cb *cardBuf) checkType(ghost bool) (int, []int) {
 	if m1 == suit {
 		ret := []int{v1, 0, 0, 0, 0}
 		j := 1
-		for i := 0; i < len(cb.s_order); i++ {
-			if v1 != cb.s_order[i] {
-				ret[j] = cb.s_order[i]
+		for i := 0; i < len(cb.sOrder); i++ {
+			if v1 != cb.sOrder[i] {
+				ret[j] = cb.sOrder[i]
 				j++
 				if j == 5 {
 					return m1, ret
@@ -352,9 +352,9 @@ func (cb *cardBuf) checkType(ghost bool) (int, []int) {
 	if m4 {
 		ret := []int{v4, 0, 0}
 		j := 1
-		for i := 0; i < len(cb.s_order); i++ {
-			if cb.s_order[i] != v4 {
-				ret[j] = cb.s_order[i]
+		for i := 0; i < len(cb.sOrder); i++ {
+			if cb.sOrder[i] != v4 {
+				ret[j] = cb.sOrder[i]
 				j++
 				if j == 3 {
 					return three, ret
@@ -366,9 +366,9 @@ func (cb *cardBuf) checkType(ghost bool) (int, []int) {
 	m5, v51, v52 := cb.check2Couple(ghost)
 	if m5 {
 		ret := []int{v51, v52, 0}
-		for i := 0; i < len(cb.s_order); i++ {
-			if cb.s_order[i] != v51 && cb.s_order[i] != v52 {
-				ret[2] = cb.s_order[i]
+		for i := 0; i < len(cb.sOrder); i++ {
+			if cb.sOrder[i] != v51 && cb.sOrder[i] != v52 {
+				ret[2] = cb.sOrder[i]
 				return couple2, ret
 			}
 		}
@@ -378,9 +378,9 @@ func (cb *cardBuf) checkType(ghost bool) (int, []int) {
 	if m6 {
 		ret := []int{v6, 0, 0, 0}
 		j := 1
-		for i := 0; i < len(cb.s_order); i++ {
-			if cb.s_order[i] != v6 {
-				ret[j] = cb.s_order[i]
+		for i := 0; i < len(cb.sOrder); i++ {
+			if cb.sOrder[i] != v6 {
+				ret[j] = cb.sOrder[i]
 				j++
 				if j == 4 {
 					return couple, ret
@@ -391,7 +391,7 @@ func (cb *cardBuf) checkType(ghost bool) (int, []int) {
 
 	ret := []int{0, 0, 0, 0, 0}
 	for i := 0; i < 5; i++ {
-		ret[i] = cb.s_order[i]
+		ret[i] = cb.sOrder[i]
 	}
 
 	if ghost {
@@ -413,10 +413,10 @@ func Process(cb1, cb2 *cardBuf, cards1, cards2 string) (int, []int, int, []int) 
 	length := len(cards1)
 	ghost1 := cb1.addCard(cards1, length)
 	ghost2 := cb2.addCard(cards2, length)
-	sortCard(cb1.d_order, cb1.d_cnt)
-	sortCard(cb1.s_order, cb1.s_cnt)
-	sortCard(cb2.d_order, cb2.d_cnt)
-	sortCard(cb2.s_order, cb2.s_cnt)
+	sortCard(cb1.dOrder, cb1.dCnt)
+	sortCard(cb1.sOrder, cb1.sCcnt)
+	sortCard(cb2.dOrder, cb2.dCnt)
+	sortCard(cb2.sOrder, cb2.sCcnt)
 
 	mode1, v1 := cb1.checkType(ghost1)
 	cb1.clear()
@@ -428,16 +428,16 @@ func Process(cb1, cb2 *cardBuf, cards1, cards2 string) (int, []int, int, []int) 
 func (cb *cardBuf) process(cards string) (int, []int) {
 	length := len(cards)
 	ghost := cb.addCard(cards, length)
-	sortCard(cb.d_order, cb.d_cnt)
-	sortCard(cb.s_order, cb.s_cnt)
+	sortCard(cb.dOrder, cb.dCnt)
+	sortCard(cb.sOrder, cb.sCcnt)
 	mode, v := cb.checkType(ghost)
 	cb.clear()
 	return mode, v
 }
 
 func (cb *cardBuf) check5SingleCardsOnlyWithoutGhost() (mode int, ret int) {
-	dat := cb.s_order
-	length := cb.s_cnt
+	dat := cb.sOrder
+	length := cb.sCcnt
 	if length != 5 {
 		// 无赖子得满5张
 		return alone, dat[0]
@@ -488,7 +488,7 @@ func (cb *SimpleCards) checkColor() bool {
 }
 
 func (cb *SimpleCards) checkType() (int, []int) {
-	dat := []int{}
+	dat := make([]int, 0)
 	if cb.checkColor() {
 		if cb.cards.mode == royal || cb.cards.mode == flush {
 			return cb.cards.mode, append(dat, cb.cards.max...)
